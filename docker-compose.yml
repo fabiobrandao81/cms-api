@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: postgres_container
+    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -15,14 +15,14 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - cmsdata:/var/lib/postgresql/data
     networks:
       - dev-network
 
   app:
     build: .
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}"
     depends_on:
       db:
         condition: service_healthy
@@ -34,4 +34,4 @@ networks:
     driver: bridge
 
 volumes:
-  pgdata:
+  cmsdata:
